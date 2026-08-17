@@ -9,7 +9,7 @@ let latest = { pitch: 0, volume: 0, confidence: 0 };
 let lastAnalysis = 0;
 let mode = 'welcome';
 let baseMidi = 60, level = 0, lift = 0, score = 0, streak = 0;
-let recentPitches = [], lastFrame = performance.now(), travelStart = 0;
+let recentPitches = [], lastFrame = performance.now(), travelStart = 0, scopePan = 0;
 let setupStage = 0, setupAnchor = 0, setupAccepted = [], setupReadyAt = 0;
 
 function midiFrequency(midi){ return 440 * 2 ** ((midi - 69) / 12); }
@@ -77,35 +77,23 @@ function analyze(now){
 }
 
 function beginSetup(){
-  setupStage=0; setupAnchor=0; setupAccepted=[]; setupReadyAt=performance.now()+500;
-  document.querySelectorAll('.setup-note').forEach((el,i)=>{el.className='setup-note'+(i===0?' active':'');});
-  $('setupPrompt').textContent='Sing any comfortable DO'; $('setupFeedback').textContent='Listening…';
+  setupStage=0; setupReadyAt=performance.now()+500;
+  document.querySelector('[data-stage="0"]').className='setup-note active';
+  $('setupPrompt').textContent='Sing your first DO'; $('setupFeedback').textContent='Listening…';
   show('setup'); requestAnimationFrame(loop);
 }
 function updateSetup(now){
   const singing=latest.pitch>0&&latest.volume>=.008&&latest.confidence>.55;
-  let error=0, correct=setupStage===0;
-  if(setupStage>0&&setupAnchor&&singing){
-    const wanted=setupAnchor*2**([0,2,4][setupStage]/12);
-    error=1200*Math.log2(latest.pitch/wanted); correct=Math.abs(error)<=35;
-  }
-  if(!singing) $('setupFeedback').textContent='Listening…';
-  else if(!correct) $('setupFeedback').textContent=error<0?'A little higher ↑':'A little lower ↓';
-  else $('setupFeedback').textContent='Got it!';
-  if(now>=setupReadyAt&&singing&&correct){
-    setupAccepted.push(latest.pitch); if(setupStage===0) setupAnchor=latest.pitch;
-    document.querySelector(`[data-stage="${setupStage}"]`).className='setup-note done'; setupStage++;
-    if(setupStage===3){
-      const rootMidis=setupAccepted.map((hz,i)=>69+12*Math.log2(hz/440)-[0,2,4][i]);
-      const estimated=rootMidis.reduce((a,b)=>a+b,0)/rootMidis.length;
-      baseMidi=Math.max(36,Math.min(72,Math.round((estimated-4)/12)*12));
-      $('setupPrompt').textContent='Voice setup complete!';
-      $('setupFeedback').textContent=`Your range: ${noteName(baseMidi)}–${noteName(baseMidi+12)}`;
-      setTimeout(startGame,900); return;
-    }
-    const el=document.querySelector(`[data-stage="${setupStage}"]`); el.classList.add('active');
-    $('setupPrompt').textContent=`Now hit ${SOLFEGE[setupStage]}`;
-    setupReadyAt=now+650;
+  $('setupFeedback').textContent=singing?`Heard ${Math.round(latest.pitch)} Hz — got your octave!`:'Listening…';
+  if(now>=setupReadyAt&&singing&&setupStage===0){
+    setupStage=1;
+    const sungMidi=69+12*Math.log2(latest.pitch/440);
+    // The first DO may be in any octave; select the matching C-to-C game range.
+    baseMidi=Math.max(36,Math.min(72,Math.round((sungMidi-4)/12)*12));
+    document.querySelector('[data-stage="0"]').className='setup-note done';
+    $('setupPrompt').textContent='Octave found!';
+    $('setupFeedback').textContent=`Your melody: ${noteName(baseMidi)}–${noteName(baseMidi+12)}`;
+    setTimeout(startGame,900);
   }
 }
 
@@ -134,10 +122,8 @@ function updateGame(now,dt){
   const cents=pitch>0?1200*Math.log2(pitch/target):null;
   const singing=pitch>0&&latest.volume>=.008&&latest.confidence>.5;
   const tuned=singing&&Math.abs(cents)<=22, near=singing&&Math.abs(cents)<=50;
-  const needle=$('needle');
-  needle.classList.toggle('hidden',!singing);
-  if(singing){ needle.style.left=`${Math.max(0,Math.min(100,cents+50))}%`; needle.classList.toggle('tuned',tuned); $('pitchReadout').textContent=`${cents>=0?'+':''}${Math.round(cents)} cents`; }
-  else $('pitchReadout').textContent=`Sing ${SOLFEGE[level]}`;
+  if(singing) $('pitchReadout').textContent=`${cents>=0?'+':''}${Math.round(cents)} cents — scope ${cents<0?'low':'high'}`;
+  else $('pitchReadout').textContent=`Sing ${SOLFEGE[level]} — the scope follows your voice`;
   if(!travelStart){
     if(tuned){ lift=Math.min(1,lift+dt/HOLD_SECONDS); $('gameMessage').textContent='Perfect — keep holding!'; }
     else if(near){ lift=Math.max(0,lift-dt*.12); $('gameMessage').textContent=cents<0?'Just a little higher ↑':'Just a little lower ↓'; }
@@ -189,8 +175,13 @@ function drawReticle(x,y,r,tuned,progress){
 }
 function drawGame(now,tuned,cents,singing){
   const w=canvas.clientWidth,h=canvas.clientHeight,cx=w/2,cy=h/2,r=Math.min(w,h)*.46;ctx.clearRect(0,0,w,h);ctx.fillStyle='#101812';ctx.fillRect(0,0,w,h);
+  // The reticle stays fixed. Pitch pans the entire view: low notes aim below
+  // the deer, high notes aim above it. This replaces the horizontal tuner.
+  const desiredPan=travelStart||!singing?0:Math.max(-65,Math.min(65,cents))*(r*.72/65);
+  scopePan+=(desiredPan-scopePan)*.18;
   ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
-  const sky=ctx.createLinearGradient(0,cy-r,0,cy+r);sky.addColorStop(0,'#bfe6ed');sky.addColorStop(.57,'#eef6df');sky.addColorStop(.58,'#78a957');sky.addColorStop(1,'#3f753e');ctx.fillStyle=sky;ctx.fillRect(cx-r,cy-r,r*2,r*2);
+  ctx.save();ctx.translate(0,scopePan);
+  const sky=ctx.createLinearGradient(0,cy-r*2,0,cy+r*2);sky.addColorStop(0,'#bfe6ed');sky.addColorStop(.57,'#eef6df');sky.addColorStop(.58,'#78a957');sky.addColorStop(1,'#3f753e');ctx.fillStyle=sky;ctx.fillRect(cx-r,cy-r*2,r*2,r*4);
   ctx.fillStyle='#758f79';ctx.beginPath();ctx.moveTo(cx-r,cy+30);ctx.lineTo(cx-r*.63,cy-r*.5);ctx.lineTo(cx-r*.35,cy-r*.15);ctx.lineTo(cx,cy-r*.72);ctx.lineTo(cx+r*.43,cy-r*.18);ctx.lineTo(cx+r*.7,cy-r*.5);ctx.lineTo(cx+r,cy+20);ctx.closePath();ctx.fill();
   ctx.fillStyle='#f7f8ef';ctx.beginPath();ctx.moveTo(cx-r*.63,cy-r*.5);ctx.lineTo(cx-r*.5,cy-r*.32);ctx.lineTo(cx-r*.35,cy-r*.15);ctx.lineTo(cx-r*.48,cy-r*.22);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(cx,cy-r*.72);ctx.lineTo(cx+r*.18,cy-r*.42);ctx.lineTo(cx+r*.02,cy-r*.51);ctx.lineTo(cx-r*.12,cy-r*.37);ctx.closePath();ctx.fill();
   ctx.fillStyle='#4b8044';ctx.beginPath();ctx.ellipse(cx,cy+r*.68,r*1.25,r*.54,0,0,Math.PI*2);ctx.fill();
@@ -198,8 +189,9 @@ function drawGame(now,tuned,cents,singing){
   const p=travelStart?Math.min(1,(now-travelStart)/1400):0;
   if(!travelStart||p<.38)drawDeer(deerX,deerY,s,travelStart?Math.max(0,1-p/.38):1);
   if(travelStart&&p>.16)drawRainbow(deerX,deerY-5*s,s,Math.min(1,(p-.16)/.28));
+  ctx.restore();
   for(let i=0;i<Math.min(score-(travelStart?1:0),8);i++)drawRainbow(cx-r*.78+i*r*.22,cy+r*.77,.18,.95);
-  if(!travelStart){const shownCents=singing?Math.max(-65,Math.min(65,cents)): -55;const targetY=deerY;const reticleY=targetY-shownCents*(r*.72/65);drawReticle(deerX,reticleY,24,tuned,lift);}
+  if(!travelStart)drawReticle(deerX,deerY,24,tuned,lift);
   if(travelStart&&p<.42){ctx.save();ctx.translate(cx,cy-r*.42);ctx.rotate(-.08);ctx.font=`${Math.round(48*s)}px Bree Serif`;ctx.textAlign='center';ctx.fillStyle='#c64035';ctx.strokeStyle='#fffdf4';ctx.lineWidth=7;ctx.strokeText('POW!',0,0);ctx.fillText('POW!',0,0);ctx.restore();}
   ctx.restore();
   ctx.strokeStyle='#d7c485';ctx.lineWidth=5;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();ctx.strokeStyle='#0d1710';ctx.lineWidth=12;ctx.beginPath();ctx.arc(cx,cy,r+8,0,Math.PI*2);ctx.stroke();

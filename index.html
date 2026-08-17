@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Bree+Serif&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=7738e21">
+  <link rel="stylesheet" href="styles.css?v=scope3">
 </head>
 <body>
   <div class="edelweiss edelweiss-one">✽</div><div class="edelweiss edelweiss-two">✽</div>
@@ -30,19 +30,15 @@
     </section>
 
     <section id="setup" class="card setup hidden" aria-live="polite">
-      <div class="eyebrow">A FRIENDLY WARM-UP</div>
-      <h2>Find your range</h2>
-      <p>Hit a comfortable DO–REH–MI. You don't need to hold these notes.</p>
-      <div class="setup-notes">
-        <div class="setup-note active" data-stage="0"><span>DO</span><small>1</small></div>
-        <div class="setup-line"></div>
-        <div class="setup-note" data-stage="1"><span>REH</span><small>2</small></div>
-        <div class="setup-line"></div>
-        <div class="setup-note" data-stage="2"><span>MI</span><small>3</small></div>
+      <div class="eyebrow">CHOOSE YOUR OCTAVE</div>
+      <h2>Give us a DO</h2>
+      <p>Sing one comfortable DO in any octave. That single note sets the range for the whole game.</p>
+      <div class="setup-notes one-note">
+        <div class="setup-note active" data-stage="0"><span>DO</span><small>any octave</small></div>
       </div>
-      <div id="setupPrompt" class="setup-prompt">Sing any comfortable DO</div>
+      <div id="setupPrompt" class="setup-prompt">Sing your first DO</div>
       <div id="setupFeedback" class="setup-feedback">Listening…</div>
-      <button id="skipButton" class="text-button">Skip setup and use C4–C5</button>
+      <button id="skipButton" class="text-button">Use C4–C5 instead</button>
     </section>
 
     <section id="game" class="game hidden">
@@ -55,8 +51,7 @@
       <div class="canvas-wrap"><canvas id="gameCanvas" aria-label="A cartoon deer seen through a magical musical scope"></canvas><div class="scope-label">MAGICAL MELODY SCOPE</div></div>
 
       <div class="tuner-card">
-        <div class="tuner-labels"><span>TOO LOW</span><strong id="pitchReadout">Sing DO</strong><span>TOO HIGH</span></div>
-        <div class="tuner"><div class="tuner-zone"></div><div class="tuner-center"></div><div id="needle" class="needle hidden"></div></div>
+        <div id="pitchReadout" class="pitch-status">Sing DO — the scope follows your voice</div>
         <div id="gameMessage" class="message">Move the bullseye onto the deer with your voice</div>
         <div class="hold-track"><div id="holdFill" class="hold-fill"></div></div>
       </div>
@@ -82,6 +77,6 @@
   </dialog>
 
   <div id="toast" class="toast hidden" role="alert"></div>
-  <script src="game.js?v=7738e21"></script>
+  <script src="game.js?v=scope3"></script>
 </body>
 </html>
