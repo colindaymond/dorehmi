@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#110d2b">
+  <meta name="description" content="Do Re Hmi — sing in tune and guide the star through every hoop.">
+  <title>Do Re Hmi — The Singing Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="glow glow-one"></div><div class="glow glow-two"></div>
+  <main class="shell">
+    <header>
+      <a class="brand" href="/" aria-label="Do Re Hmi home">
+        <span class="brand-note">♪</span><span>DO RE <strong>HMI</strong></span>
+      </a>
+      <button id="helpButton" class="icon-button" aria-label="How to play">?</button>
+    </header>
+
+    <section id="welcome" class="card welcome">
+      <div class="eyebrow">YOUR VOICE IS THE CONTROLLER</div>
+      <h1>Sing it.<br><span>Send it.</span></h1>
+      <p>Hold each note in tune to lift your star through the scale.</p>
+      <button id="startButton" class="primary">Play with microphone <span>→</span></button>
+      <p class="privacy">🔒 Your audio is processed live in your browser and never uploaded.</p>
+    </section>
+
+    <section id="setup" class="card setup hidden" aria-live="polite">
+      <div class="eyebrow">QUICK VOICE SETUP</div>
+      <h2>Find your range</h2>
+      <p>Hit a comfortable DO–RE–MI. You don't need to hold these notes.</p>
+      <div class="setup-notes">
+        <div class="setup-note active" data-stage="0"><span>DO</span><small>1</small></div>
+        <div class="setup-line"></div>
+        <div class="setup-note" data-stage="1"><span>RE</span><small>2</small></div>
+        <div class="setup-line"></div>
+        <div class="setup-note" data-stage="2"><span>MI</span><small>3</small></div>
+      </div>
+      <div id="setupPrompt" class="setup-prompt">Sing any comfortable DO</div>
+      <div id="setupFeedback" class="setup-feedback">Listening…</div>
+      <button id="skipButton" class="text-button">Skip setup and use C4–C5</button>
+    </section>
+
+    <section id="game" class="game hidden">
+      <div class="game-top">
+        <div><div class="label">SCORE</div><div id="score" class="stat">0</div></div>
+        <div class="target-wrap"><div class="label">TARGET NOTE</div><div><span id="solfege" class="solfege">DO</span> <span id="noteName" class="note-name">C4</span></div></div>
+        <div class="align-right"><div class="label">STREAK</div><div id="streak" class="stat">0</div></div>
+      </div>
+
+      <div class="canvas-wrap"><canvas id="gameCanvas"></canvas></div>
+
+      <div class="tuner-card">
+        <div class="tuner-labels"><span>FLAT</span><strong id="pitchReadout">Sing DO</strong><span>SHARP</span></div>
+        <div class="tuner"><div class="tuner-zone"></div><div class="tuner-center"></div><div id="needle" class="needle hidden"></div></div>
+        <div id="gameMessage" class="message">Sing and hold the target note</div>
+        <div class="hold-track"><div id="holdFill" class="hold-fill"></div></div>
+      </div>
+
+      <div class="controls">
+        <button id="octaveButton" class="secondary">Change octave <kbd>O</kbd></button>
+        <button id="resetButton" class="secondary">Start over <kbd>R</kbd></button>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="helpDialog">
+    <button id="closeHelp" class="dialog-close" aria-label="Close">×</button>
+    <div class="eyebrow">HOW TO PLAY</div>
+    <h2>Use your voice</h2>
+    <ol>
+      <li><b>Allow microphone access.</b> Audio stays on your device.</li>
+      <li><b>Sing the target note.</b> The tuner shows if you're flat or sharp.</li>
+      <li><b>Hold it in tune.</b> Your star rises as long as you stay within ±22 cents.</li>
+      <li><b>Clear all eight hoops</b> to finish the scale.</li>
+    </ol>
+  </dialog>
+
+  <div id="toast" class="toast hidden" role="alert"></div>
+  <script src="game.js"></script>
+</body>
+</html>
