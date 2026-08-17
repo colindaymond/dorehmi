@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const screens = { welcome: $('welcome'), setup: $('setup'), game: $('game') };
 const NOTES = ['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
-const SOLFEGE = ['DO','RE','MI','FA','SOL','LA','TI','DO'];
+const SOLFEGE = ['DO','REH','MI','FA','SOL','LA','TI','DO'];
 const OFFSETS = [0,2,4,5,7,9,11,12];
 const HOLD_SECONDS = 1.15;
 let audioContext, analyser, micStream, audioBuffer;
