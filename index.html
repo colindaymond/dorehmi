@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#110d2b">
-  <meta name="description" content="Do Reh Mi — sing in tune and guide the star through every hoop.">
+  <meta name="theme-color" content="#225c38">
+  <meta name="description" content="Do Reh Mi — a friendly alpine singing adventure.">
   <title>Do Reh Mi — The Singing Game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Bree+Serif&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="glow glow-one"></div><div class="glow glow-two"></div>
+  <div class="edelweiss edelweiss-one">✽</div><div class="edelweiss edelweiss-two">✽</div>
   <main class="shell">
     <header>
       <a class="brand" href="./" aria-label="Do Reh Mi home">
@@ -22,15 +22,15 @@
     </header>
 
     <section id="welcome" class="card welcome">
-      <div class="eyebrow">YOUR VOICE IS THE CONTROLLER</div>
-      <h1>Sing it.<br><span>Send it.</span></h1>
-      <p>Hold each note in tune to lift your star through the scale.</p>
-      <button id="startButton" class="primary">Play with microphone <span>→</span></button>
+      <div class="eyebrow">AN ALPINE SINGING ADVENTURE</div>
+      <h1>The hills are<br><span>calling.</span></h1>
+      <p>Warm up your voice, follow the notes, and discover a little rainbow magic in the mountains.</p>
+      <button id="startButton" class="primary">Begin the adventure <span>→</span></button>
       <p class="privacy">🔒 Your audio is processed live in your browser and never uploaded.</p>
     </section>
 
     <section id="setup" class="card setup hidden" aria-live="polite">
-      <div class="eyebrow">QUICK VOICE SETUP</div>
+      <div class="eyebrow">A FRIENDLY WARM-UP</div>
       <h2>Find your range</h2>
       <p>Hit a comfortable DO–REH–MI. You don't need to hold these notes.</p>
       <div class="setup-notes">
@@ -47,17 +47,17 @@
 
     <section id="game" class="game hidden">
       <div class="game-top">
-        <div><div class="label">SCORE</div><div id="score" class="stat">0</div></div>
+        <div><div class="label">ANTLER RAINBOWS</div><div id="score" class="stat">🌈 0</div></div>
         <div class="target-wrap"><div class="label">TARGET NOTE</div><div><span id="solfege" class="solfege">DO</span> <span id="noteName" class="note-name">C4</span></div></div>
-        <div class="align-right"><div class="label">STREAK</div><div id="streak" class="stat">0</div></div>
+        <div class="align-right"><div class="label">MELODY</div><div id="streak" class="stat small-stat">1 / 8</div></div>
       </div>
 
-      <div class="canvas-wrap"><canvas id="gameCanvas"></canvas></div>
+      <div class="canvas-wrap"><canvas id="gameCanvas" aria-label="A cartoon deer seen through a magical musical scope"></canvas><div class="scope-label">MAGICAL MELODY SCOPE</div></div>
 
       <div class="tuner-card">
-        <div class="tuner-labels"><span>FLAT</span><strong id="pitchReadout">Sing DO</strong><span>SHARP</span></div>
+        <div class="tuner-labels"><span>TOO LOW</span><strong id="pitchReadout">Sing DO</strong><span>TOO HIGH</span></div>
         <div class="tuner"><div class="tuner-zone"></div><div class="tuner-center"></div><div id="needle" class="needle hidden"></div></div>
-        <div id="gameMessage" class="message">Sing and hold the target note</div>
+        <div id="gameMessage" class="message">Move the bullseye onto the deer with your voice</div>
         <div class="hold-track"><div id="holdFill" class="hold-fill"></div></div>
       </div>
 
@@ -74,9 +74,10 @@
     <h2>Use your voice</h2>
     <ol>
       <li><b>Allow microphone access.</b> Audio stays on your device.</li>
-      <li><b>Sing the target note.</b> The tuner shows if you're flat or sharp.</li>
-      <li><b>Hold it in tune.</b> Your star rises as long as you stay within ±22 cents.</li>
-      <li><b>Clear all eight hoops</b> to finish the scale.</li>
+      <li><b>Sing the target note.</b> Your voice moves the magical scope up and down.</li>
+      <li><b>Line up the bullseye.</b> Too low sits below the deer; too high floats above it.</li>
+      <li><b>Hold it on target.</b> The friendly deer magically transforms into an antler rainbow—no bumps or boo-boos.</li>
+      <li><b>Collect all eight rainbows</b> to finish the melody.</li>
     </ol>
   </dialog>
 
