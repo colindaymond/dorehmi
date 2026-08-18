@@ -8,8 +8,8 @@
   <title>Do Reh Mi — The Singing Game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Bree+Serif&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=scope3">
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,500;0,600;0,700;1,500&family=Lobster&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=postcard1">
 </head>
 <body>
   <div class="edelweiss edelweiss-one">✽</div><div class="edelweiss edelweiss-two">✽</div>
@@ -27,18 +27,6 @@
       <p>Warm up your voice, follow the notes, and discover a little rainbow magic in the mountains.</p>
       <button id="startButton" class="primary">Begin the adventure <span>→</span></button>
       <p class="privacy">🔒 Your audio is processed live in your browser and never uploaded.</p>
-    </section>
-
-    <section id="setup" class="card setup hidden" aria-live="polite">
-      <div class="eyebrow">CHOOSE YOUR OCTAVE</div>
-      <h2>Give us a DO</h2>
-      <p>Sing one comfortable DO in any octave. That single note sets the range for the whole game.</p>
-      <div class="setup-notes one-note">
-        <div class="setup-note active" data-stage="0"><span>DO</span><small>any octave</small></div>
-      </div>
-      <div id="setupPrompt" class="setup-prompt">Sing your first DO</div>
-      <div id="setupFeedback" class="setup-feedback">Listening…</div>
-      <button id="skipButton" class="text-button">Use C4–C5 instead</button>
     </section>
 
     <section id="game" class="game hidden">
@@ -69,7 +57,8 @@
     <h2>Use your voice</h2>
     <ol>
       <li><b>Allow microphone access.</b> Audio stays on your device.</li>
-      <li><b>Sing the target note.</b> Your voice moves the magical scope up and down.</li>
+      <li><b>Start with DO in any octave.</b> The game quietly locks that octave while you sing—there is no setup screen.</li>
+      <li><b>Sing the target note.</b> Your voice smoothly pans the magical scope up and down.</li>
       <li><b>Line up the bullseye.</b> Too low sits below the deer; too high floats above it.</li>
       <li><b>Hold it on target.</b> The friendly deer magically transforms into an antler rainbow—no bumps or boo-boos.</li>
       <li><b>Collect all eight rainbows</b> to finish the melody.</li>
@@ -77,6 +66,6 @@
   </dialog>
 
   <div id="toast" class="toast hidden" role="alert"></div>
-  <script src="game.js?v=scope3"></script>
+  <script src="game.js?v=postcard1"></script>
 </body>
 </html>
