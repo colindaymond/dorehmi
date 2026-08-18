@@ -4,8 +4,8 @@ const NOTES = ['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
 const SOLFEGE = ['DO','REH','MI','FA','SOL','LA','TI','DO'];
 const OFFSETS = [0,2,4,5,7,9,11,12];
 const HOLD_SECONDS = 1.15;
-const deerPhoto=new Image(),alpinePhoto=new Image();
-deerPhoto.src='assets/deer.jpg';alpinePhoto.src='assets/alps.jpg';
+const scenePhoto=new Image(),finalePhoto=new Image();
+scenePhoto.src='assets/generated-alpine-deer-2.jpg';finalePhoto.src='assets/generated-finale.jpg';
 let audioContext, analyser, micStream, audioBuffer;
 let latest = { pitch: 0, volume: 0, confidence: 0, sequence: 0 };
 let lastAnalysis = 0, lastPitchSequence = -1;
@@ -183,31 +183,34 @@ function drawVintageGrain(w,h,now){
   for(let i=0;i<170;i++){const x=(i*83+now*.017)%w,y=(i*149+Math.sin(i*7)*31+h)%h,a=.025+(i%5)*.008;ctx.fillStyle=`rgba(255,244,210,${a})`;ctx.fillRect(x,y,1+(i%3),1+(i%2));}
   ctx.globalAlpha=.12;ctx.strokeStyle='#fff3cf';for(let i=0;i<3;i++){const x=(now*.012+i*w*.37)%w;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x-3,h);ctx.stroke();}ctx.restore();
 }
-const DEER_FOCI=[[.35,.66],[.69,.62],[.83,.59],[.34,.65],[.7,.61],[.82,.6],[.36,.66],[.68,.62]];
-function drawDeerPhotoTarget(cx,cy,r,index,pan){
-  if(!deerPhoto.complete||!deerPhoto.naturalWidth)return false;
-  const [fx,fy]=DEER_FOCI[index%DEER_FOCI.length],dw=r*3.4,dh=dw*deerPhoto.naturalHeight/deerPhoto.naturalWidth;
-  ctx.save();ctx.filter='sepia(.78) saturate(.58) contrast(1.18) brightness(.9)';ctx.drawImage(deerPhoto,cx-fx*dw,cy-fy*dh+pan,dw,dh);ctx.restore();return true;
+function drawContinuousScene(cx,cy,r,index,pan){
+  if(!scenePhoto.complete||!scenePhoto.naturalWidth)return false;
+  const dw=r*3.25,dh=dw*scenePhoto.naturalHeight/scenePhoto.naturalWidth;
+  // Every target is a pan across one generated, continuous landscape—never a collage.
+  const subtleX=Math.sin(index*1.91)*r*.08;
+  ctx.save();ctx.filter='sepia(.62) saturate(.68) contrast(1.15) brightness(.94)';ctx.drawImage(scenePhoto,cx-.52*dw+subtleX,cy-.71*dh+pan,dw,dh);ctx.restore();return true;
+}
+const KITSCH_COLORS=['#ff3158','#ff8b25','#ffe33f','#36cf72','#25bce8','#7868ff'];
+function drawGiantRainbow(cx,base,radius,alpha=1){
+  ctx.save();ctx.globalAlpha=alpha;ctx.lineCap='round';const band=Math.max(14,radius*.075);
+  KITSCH_COLORS.forEach((color,i)=>{ctx.strokeStyle=color;ctx.lineWidth=band;ctx.shadowColor=color;ctx.shadowBlur=12;ctx.beginPath();ctx.arc(cx,base,radius-i*band*.82,Math.PI,Math.PI*2);ctx.stroke();});ctx.shadowBlur=0;
+  ctx.fillStyle='#fff';for(const side of [-1,1])for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(cx+side*(radius-band*2)+side*i*band*.38,base-i%2*band*.22,band*.72,0,Math.PI*2);ctx.fill();}ctx.restore();
 }
 function drawRainbowExplosion(now,p,w,h){
-  const colors=['#d54238','#ef8737','#f3cf43','#4ba95a','#3a91bd','#72549a'];
-  const blast=Math.min(1,p/.55),cx=w/2,cy=h/2;
-  ctx.save();ctx.globalCompositeOperation='screen';
-  for(let ray=0;ray<24;ray++){const a=ray*Math.PI*2/24+now*.00025,len=(40+Math.sin(ray*9)*18)+blast*Math.max(w,h)*.85;ctx.strokeStyle=colors[ray%colors.length];ctx.globalAlpha=.35+.45*(1-blast);ctx.lineWidth=8+ray%4*3;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*25,cy+Math.sin(a)*25);ctx.lineTo(cx+Math.cos(a)*len,cy+Math.sin(a)*len);ctx.stroke();}
-  ctx.globalCompositeOperation='source-over';for(let i=0;i<80;i++){const a=i*2.399,len=blast*(60+(i%17)*18),x=cx+Math.cos(a)*len,y=cy+Math.sin(a)*len;ctx.fillStyle=colors[i%6];ctx.save();ctx.translate(x,y);ctx.rotate(a+now*.004);ctx.fillRect(-5,-2,10,4);ctx.restore();}
-  ctx.globalAlpha=Math.max(0,1-p*2.4);ctx.fillStyle='#fff8d8';ctx.fillRect(0,0,w,h);ctx.restore();
+  const blast=Math.min(1,p/.58),ease=1-(1-blast)**3,max=Math.max(w,h);ctx.save();
+  ctx.fillStyle=`rgba(255,192,218,${.2*(1-p)})`;ctx.fillRect(0,0,w,h);
+  drawGiantRainbow(w/2,h*.92,max*.82*ease,Math.min(1,blast*1.8));
+  drawGiantRainbow(w*.12,h*.54,max*.45*ease,Math.min(.9,blast*1.5));drawGiantRainbow(w*.9,h*.6,max*.4*ease,Math.min(.9,blast*1.5));
+  ctx.font=`${Math.max(20,w/28)}px sans-serif`;ctx.textAlign='center';for(let i=0;i<54;i++){const a=i*2.399,len=ease*(60+(i%13)*Math.max(12,w/35)),x=w/2+Math.cos(a)*len,y=h/2+Math.sin(a)*len;ctx.save();ctx.translate(x,y);ctx.rotate(now*.003+i);ctx.fillText(i%3?'★':'♥',0,0);ctx.restore();}
+  ctx.globalAlpha=Math.max(0,1-p*3);ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.restore();
 }
-function drawDeerPortrait(x,y,size,index,now){
-  if(!deerPhoto.complete||!deerPhoto.naturalWidth)return;
-  const [fx,fy]=DEER_FOCI[index%3],sw=deerPhoto.naturalWidth*.23,sh=deerPhoto.naturalHeight*.5,sx=fx*deerPhoto.naturalWidth-sw/2,sy=fy*deerPhoto.naturalHeight-sh*.52;
-  ctx.save();ctx.beginPath();ctx.ellipse(x,y,size*.43,size*.52,0,0,Math.PI*2);ctx.clip();ctx.filter='sepia(.5) saturate(.8) contrast(1.1)';ctx.drawImage(deerPhoto,sx,sy,sw,sh,x-size*.43,y-size*.52,size*.86,size*1.04);ctx.restore();ctx.strokeStyle='#fff0c4';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x,y,size*.43,size*.52,0,0,Math.PI*2);ctx.stroke();
-}
+
 function drawFinale(now,w,h,cx,cy,r){
-  const elapsed=now-finaleStart,p=Math.min(1,elapsed/1800),zoomR=r+p*Math.max(w,h)*.8;
-  ctx.fillStyle='#17150f';ctx.fillRect(0,0,w,h);ctx.save();ctx.beginPath();ctx.arc(cx,cy,zoomR,0,Math.PI*2);ctx.clip();ctx.save();ctx.filter='sepia(.62) saturate(.62) contrast(1.1)';drawPhotoCover(alpinePhoto,0,0,w,h);ctx.restore();ctx.fillStyle='rgba(107,69,37,.2)';ctx.fillRect(0,0,w,h);
-  const colors=['#c93f37','#e27a32','#e7bd3d','#4a9654','#438ca8','#71518a'],rr=Math.min(w*.43,h*.6);ctx.lineCap='round';colors.forEach((c,i)=>{ctx.strokeStyle=c;ctx.lineWidth=Math.max(8,w/65);ctx.beginPath();ctx.arc(cx,h*.7,rr-i*Math.max(9,w/68),Math.PI,Math.PI*2);ctx.stroke();});
-  const dance=Math.max(0,Math.min(1,(elapsed-900)/900));for(let i=0;i<8;i++){const x=w*.09+i*w*.117,y=h*.76+Math.sin(now*.008+i*1.7)*18*dance;drawDeerPortrait(x,y,Math.min(85,w/9),i,now);}
-  ctx.font=`700 ${Math.max(24,w/18)}px "Poiret One"`;ctx.textAlign='center';ctx.fillStyle='#fff3cf';ctx.shadowColor='#513720';ctx.shadowBlur=7;ctx.fillText('ACHT REGENBOGEN!',cx,h*.15);ctx.shadowBlur=0;drawVintageGrain(w,h,now);ctx.restore();
+  const elapsed=now-finaleStart,p=Math.min(1,elapsed/1800),zoomR=r+p*Math.max(w,h)*.9,dance=Math.max(0,Math.min(1,(elapsed-700)/900));
+  ctx.fillStyle='#17150f';ctx.fillRect(0,0,w,h);ctx.save();ctx.beginPath();ctx.arc(cx,cy,zoomR,0,Math.PI*2);ctx.clip();
+  ctx.save();ctx.translate(cx,cy+Math.sin(now*.009)*13*dance);ctx.rotate(Math.sin(now*.006)*.018*dance);ctx.scale(1.04+Math.sin(now*.011)*.012*dance,1.04);ctx.translate(-cx,-cy);ctx.filter='sepia(.32) saturate(.85) contrast(1.08)';drawPhotoCover(finalePhoto,0,0,w,h);ctx.restore();
+  drawGiantRainbow(cx,h*.88,Math.max(w,h)*.72,Math.min(1,p*1.8));drawGiantRainbow(w*.1,h*.55,Math.max(w,h)*.37,Math.min(.8,p));drawGiantRainbow(w*.92,h*.58,Math.max(w,h)*.4,Math.min(.8,p));
+  ctx.font=`700 ${Math.max(25,w/17)}px "Poiret One"`;ctx.textAlign='center';ctx.fillStyle='#fff8dc';ctx.shadowColor='#7a3150';ctx.shadowBlur=10;ctx.fillText('ACHT REGENBOGEN!',cx,h*.14);ctx.shadowBlur=0;drawVintageGrain(w,h,now);ctx.restore();
   if(p<1){ctx.strokeStyle='#d7c485';ctx.lineWidth=7;ctx.beginPath();ctx.arc(cx,cy,zoomR,0,Math.PI*2);ctx.stroke();}
 }
 function drawGame(now,tuned,cents,singing){
@@ -219,8 +222,7 @@ function drawGame(now,tuned,cents,singing){
   const desiredPan=travelStart||!singing?0:Math.max(-65,Math.min(65,cents))*(r*1.38/65);
   scopeVelocity+=(desiredPan-scopePan)*.045;scopeVelocity*=.82;scopePan=Math.max(-r*1.45,Math.min(r*1.45,scopePan+scopeVelocity));
   ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
-  ctx.save();ctx.filter='sepia(.82) saturate(.48) contrast(1.15)';drawPhotoCover(alpinePhoto,cx-r,cy-r*1.8+scopePan*.22,r*2,r*3.6);ctx.restore();
-  drawDeerPhotoTarget(cx,deerY,r,level,scopePan);drawVintageGrain(w,h,now);
+  drawContinuousScene(cx,deerY,r,level,scopePan);drawVintageGrain(w,h,now);
   if(travelStart){ctx.fillStyle=`rgba(255,244,205,${Math.max(0,.45-p)})`;ctx.fillRect(0,0,w,h);}
   for(let i=0;i<Math.min(score-(travelStart?1:0),8);i++)drawRainbow(cx-r*.78+i*r*.22,cy+r*.77,.18,.9);
   if(!travelStart)drawReticle(cx,deerY,25,tuned,lift);
